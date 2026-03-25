@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Track Complaint | College Box</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="/" class="logo" style="text-decoration:none;">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">Complaint<strong>Box</strong></span>
+      </a>
+      <a href="/" class="btn btn-ghost btn-sm">← Back</a>
+    </div>
+  </header>
+
+  <main class="form-wrapper">
+    <div class="form-card">
+      <h1 class="hero-title" style="font-size: 2.5rem; margin-bottom: 10px;">Track Progress</h1>
+      <p class="hero-sub" style="margin-bottom: 30px;">Enter your unique Complaint ID to see real-time updates.</p>
+      
+      <div class="form-group">
+        <label for="trackIdInput">Complaint ID</label>
+        <input type="text" id="trackIdInput" placeholder="e.g., 102" autocomplete="off">
+        <button id="btnTrack" class="btn btn-primary" style="margin-top: 20px; width: 100%;">
+            <span class="btn-text">Search Database</span>
+        </button>
+      </div>
+
+      <div id="trackResult" class="track-result-box" style="display:none; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div class="modal-field">
+            <div class="modal-field-label">Title</div>
+            <div class="modal-field-value" id="resTitle" style="font-size:18px; font-weight:700;"></div>
+        </div>
+        <div class="modal-field">
+            <div class="modal-field-label">Status</div>
+            <span id="resStatus" class="card-badge"></span>
+        </div>
+        <div class="modal-field">
+            <div class="modal-field-label">Submitted On</div>
+            <div class="modal-field-value" id="resDate" style="font-size:13px; opacity:0.7;"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('btnTrack').addEventListener('click', async () => {
+        const id = document.getElementById('trackIdInput').value;
+        const resBox = document.getElementById('trackResult');
+        
+        if(!id) return alert("Please enter an ID");
+
+        try {
+            const response = await fetch(`/api/track/${id}`);
+            const data = await response.json();
+            
+            if (response.ok) {
+                resBox.style.display = 'block';
+                document.getElementById('resTitle').innerText = data.title;
+                document.getElementById('resStatus').innerText = data.status.toUpperCase();
+                
+                // Set badge color based on status
+                document.getElementById('resStatus').className = `card-badge badge-${data.status}`;
+                
+                const date = new Date(data.created_at);
+                document.getElementById('resDate').innerText = date.toLocaleDateString("en-IN", { 
+                    day:"2-digit", month:"short", year:"numeric" 
+                });
+            } else {
+                alert("ID not found. Double check your receipt.");
+            }
+        } catch (err) {
+            alert("Connection error.");
+        }
+    });
+  </script>
+</body>
+</html>

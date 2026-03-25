@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | College Portal</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .login-box { max-width: 400px; margin: 100px auto; padding: 40px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(10px); }
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .tab-group { display: flex; gap: 10px; margin-bottom: 25px; background: rgba(0,0,0,0.2); padding: 5px; border-radius: 10px; }
+        .tab { flex: 1; padding: 10px; border: none; background: none; color: #888; cursor: pointer; font-family: 'Syne'; border-radius: 8px; transition: 0.3s; }
+        .tab.active { background: #6366f1; color: white; }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+
+    <div class="login-box">
+        <div class="login-header">
+            <span class="logo-icon" style="font-size: 30px;">⬡</span>
+            <h2 style="font-family: 'Syne'; margin-top: 10px;">Portal Sign In</h2>
+        </div>
+
+        <div class="tab-group">
+            <button class="tab active" onclick="setRole('student')">Student</button>
+            <button class="tab" onclick="setRole('admin')">Staff/Admin</button>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label id="userLabel">PRN / Roll No</label>
+                <input type="text" id="username" placeholder="Enter your ID" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Sign In</button>
+        </form>
+        <p id="loginMsg" style="color: #ff4d4d; font-size: 13px; margin-top: 15px; text-align: center;"></p>
+    </div>
+
+    <script>
+        let currentRole = 'student';
+        function setRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('userLabel').innerText = role === 'student' ? 'PRN / Roll No' : 'Admin Username';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+
+            if (currentRole === 'admin') {
+                // Hits your existing /admin/login route
+                const res = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username: user, password: pass})
+                });
+                if(res.ok) window.location.href = '/admin';
+                else document.getElementById('loginMsg').innerText = "Invalid Admin Credentials";
+            } else {
+                // Student logic (for now, let's just mock it or point to track)
+                document.getElementById('loginMsg').style.color = "#6366f1";
+                document.getElementById('loginMsg').innerText = "Student Dashboard coming soon! Use 'Track' for now.";
+            }
+        });
+    </script>
+</body>
+</html>

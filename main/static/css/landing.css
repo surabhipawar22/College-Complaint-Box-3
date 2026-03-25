@@ -1,0 +1,38 @@
+.action-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+    padding: 0 1rem;
+}
+
+.portal-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-decoration: none;
+    color: white;
+    transition: all 0.3s ease;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.portal-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: #6366f1; /* Neon Purple/Blue */
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+.card-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    display: block;
+}
+
+.portal-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
