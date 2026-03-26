@@ -154,4 +154,6 @@ def delete_complaint(complaint_id):
     return jsonify({"message": "Deleted"})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Uses the port Render provides, or 5000 if local
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
