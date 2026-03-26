@@ -4,13 +4,7 @@ from flask_cors import CORS
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-
-
-app = Flask(__name__)
-app.secret_key = "super_secret_key_change_this" # Important for sessions
-
-
-# Load .env locally
+# Safe load for local development (won't crash on Render)
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -18,44 +12,31 @@ except ImportError:
     pass
 
 app = Flask(__name__)
-CORS(app)
 
-# Config
-DATABASE_URL = os.environ.get("DATABASE_URL")
+# ─── CONFIGURATION ──────────────────────────────────
+# Render will provide these via Environment Variables
+app.secret_key = os.environ.get("SECRET_KEY", "default_key_123")
+
+# Your Supabase URL
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL", 
+    "postgresql://postgres.qzmzbnptkqslmgcbnywl:Surbhi%402234@aws-1-ap-southeast-1.pooler.supabase.com:5432/postgres"
+)
+
+# Admin Credentials
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 
+# ─── DATABASE CONNECTION ────────────────────────────
 def get_db_connection():
+    # SSL is required for Supabase on most cloud platforms
     url = DATABASE_URL
     if "sslmode" not in url:
-        url += "&sslmode=require" if "?" in url else "?sslmode=require"
+        separator = "&" if "?" in url else "?"
+        url += f"{separator}sslmode=require"
     return psycopg2.connect(url)
 
-def init_db():
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("""
-            CREATE TABLE IF NOT EXISTS complaints (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(120),
-                email VARCHAR(254),
-                department VARCHAR(100) NOT NULL,
-                title VARCHAR(200) NOT NULL,
-                description TEXT NOT NULL,
-                status VARCHAR(20) NOT NULL DEFAULT 'pending',
-                created_at TIMESTAMP NOT NULL DEFAULT NOW()
-            );
-        """)
-        conn.commit()
-        cur.close()
-        conn.close()
-        print("Database initialized successfully.")
-    except Exception as e:
-        print(f"Error initializing database: {e}")
-
-with app.app_context():
-    init_db()
+# ... (rest of your routes: /submit_complaint, /login, etc.)
 
 # ─── PAGE ROUTES ───────────────────────────────────
 
